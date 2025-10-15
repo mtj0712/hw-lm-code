@@ -556,21 +556,13 @@ class EmbeddingLogLinearLanguageModel(LanguageModel, nn.Module):
                 log_prob = self.log_prob_tensor(x, y, z)
                 regularizer = self.l2 / N * ((self.X ** 2).sum() + (self.Y ** 2).sum())
                 F_i = log_prob - regularizer
-                F_i.backward()
-
-                eta = eta0 / (1 + eta0 * 2 * self.l2 / N * t)
 
                 with torch.no_grad():
                     F += F_i / N
-                    self.X += eta * self.X.grad
-                    self.Y += eta * self.Y.grad
 
-                    self.X.grad.zero_()
-                    self.Y.grad.zero_()
-
-                # (-F_i).backward()
-                # optimizer.step()
-                # optimizer.zero_grad()
+                (-F_i).backward()
+                optimizer.step()
+                optimizer.zero_grad()
 
                 t += 1
 
@@ -604,8 +596,6 @@ class EmbeddingLogLinearLanguageModel(LanguageModel, nn.Module):
 
 
 class ImprovedLogLinearLanguageModel(EmbeddingLogLinearLanguageModel):
-    # TODO: IMPLEMENT ME!
-    
     # This is where you get to come up with some features of your own, as
     # described in the reading handout.  This class inherits from
     # EmbeddingLogLinearLanguageModel and you can override anything, such as
@@ -630,4 +620,89 @@ class ImprovedLogLinearLanguageModel(EmbeddingLogLinearLanguageModel):
     # * You could use a different optimization algorithm instead of SGD, such
     #   as `torch.optim.Adam` (https://pytorch.org/docs/stable/optim.html).
     #
-    pass
+    def train(self, file: Path):    # type: ignore
+        
+        ### Technically this method shouldn't be called `train`,
+        ### because this means it overrides not only `LanguageModel.train` (as desired)
+        ### but also `nn.Module.train` (which has a different type). 
+        ### However, we won't be trying to use the latter method.
+        ### The `type: ignore` comment above tells the type checker to ignore this inconsistency.
+        
+        # Optimization hyperparameters.
+        eta0 = 1e-2  # initial learning rate
+
+        # Initialize the parameter matrices to be full of zeros.
+        nn.init.zeros_(self.X)   # type: ignore
+        nn.init.zeros_(self.Y)   # type: ignore
+
+        N = num_tokens(file)
+        log.info(f"Start optimizing on {N} training tokens...")
+
+        #####################
+        # Implement your SGD here by taking gradient steps on a sequence
+        # of training examples.  Here's how to use PyTorch to make it easy:
+        #
+        # To get the training examples, you can use the `read_trigrams` function
+        # we provided, which will iterate over all N trigrams in the training
+        # corpus.  (Its use is illustrated in fileprob.py.)
+        #
+        # For each successive training example i, compute the stochastic
+        # objective F_i(θ).  This is called the "forward" computation. Don't
+        # forget to include the regularization term. Part of F_i(θ) will be the
+        # log probability of training example i, which the helper method
+        # log_prob_tensor computes.  It is important to use log_prob_tensor
+        # (as opposed to log_prob which returns float) because torch.Tensor
+        # is an object with additional bookkeeping that tracks e.g. the gradient
+        # function for backpropagation as well as accumulated gradient values
+        # from backpropagation.
+        #
+        # To get the gradient of this objective (∇F_i(θ)), call the `backward`
+        # method on the number you computed at the previous step.  This invokes
+        # back-propagation to get the gradient of this number with respect to
+        # the parameters θ.  This should be easier than implementing the
+        # gradient method from the handout.
+        #
+        # Finally, update the parameters in the direction of the gradient, as
+        # shown in Algorithm 1 in the reading handout.  You can do this `+=`
+        # yourself, or you can call the `step` method of the `optimizer` object
+        # we created above.  See the reading handout for more details on this.
+        #
+        # For the EmbeddingLogLinearLanguageModel, you should run SGD
+        # optimization for the given number of epochs and then stop.  You might 
+        # want to print progress dots using the `show_progress` method defined above.  
+        # Even better, you could show a graphical progress bar using the tqdm module --
+        # simply iterate over
+        #     tqdm.tqdm(read_trigrams(file), total=N*epochs)
+        # instead of iterating over
+        #     read_trigrams(file)
+        #####################
+
+        print(f"Training from corpus {file}")
+        t = 0
+        for epoch in range(1, self.epochs + 1):
+            F = 0
+            x: Wordtype; y: Wordtype; z: Wordtype
+            for (x, y, z) in read_trigrams(file, self.vocab):
+                log_prob = self.log_prob_tensor(x, y, z)
+                regularizer = self.l2 / N * ((self.X ** 2).sum() + (self.Y ** 2).sum())
+                F_i = log_prob - regularizer
+                F_i.backward()
+
+                eta = eta0 / (1 + eta0 * 2 * self.l2 / N * t)
+
+                with torch.no_grad():
+                    F += F_i / N
+                    self.X += eta * self.X.grad
+                    self.Y += eta * self.Y.grad
+
+                    self.X.grad.zero_()
+                    self.Y.grad.zero_()
+
+                t += 1
+
+                self.show_progress()
+            
+            print(f"epoch {epoch}: F = {F}")
+
+        log.info("done optimizing.")
+        print(f"Finished training on {N} tokens")
