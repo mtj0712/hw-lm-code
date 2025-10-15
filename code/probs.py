@@ -394,6 +394,10 @@ class EmbeddingLogLinearLanguageModel(LanguageModel, nn.Module):
 
         self.OOV_i = self.vocab.index("OOV")
 
+        self.logits_mem = [None] * len(vocab)
+        for i in range(len(vocab)):
+            self.logits_mem[i] = [None] * len(vocab)
+
         # We wrap the following matrices in nn.Parameter objects.
         # This lets PyTorch know that these are parameters of the model
         # that should be listed in self.parameters() and will be
@@ -459,12 +463,17 @@ class EmbeddingLogLinearLanguageModel(LanguageModel, nn.Module):
         # vocabulary, and "embedding" will be replaced by the embedding
         # dimensionality as given by the lexicon.  See
         # https://www.cs.jhu.edu/~jason/465/hw-lm/code/INSTRUCTIONS.html#a-note-on-type-annotations
-        x_embedding = self.find_embedding(x)
-        y_embedding = self.find_embedding(y)
+        x_i = self.find_index_in_vocab(x)
+        y_i = self.find_index_in_vocab(y)
 
-        v = x_embedding.view(1, -1) @ self.X + y_embedding.view(1, -1) @ self.Y
-        result = v @ self.embeddings.t()
-        return result.view(-1)
+        if self.logits_mem[x_i][y_i] is None:
+            x_embedding = self.embeddings[x_i]
+            y_embedding = self.embeddings[y_i]
+            v = x_embedding.view(1, -1) @ self.X + y_embedding.view(1, -1) @ self.Y
+            result = v @ self.embeddings.t()
+            self.logits_mem[x_i][y_i] = result.view(-1)
+
+        return self.logits_mem[x_i][y_i]
     
     def find_index_in_vocab(self, x: Wordtype) -> int:
         """Return the index of the word x."""
@@ -475,9 +484,9 @@ class EmbeddingLogLinearLanguageModel(LanguageModel, nn.Module):
         
         return i
 
-    def find_embedding(self, x: Wordtype) -> torch.Tensor:
-        """Return the vector embedding of the word x."""
-        return self.embeddings[self.find_index_in_vocab(x)]
+    # def find_embedding(self, x: Wordtype) -> torch.Tensor:
+    #     """Return the vector embedding of the word x."""
+    #     return self.embeddings[self.find_index_in_vocab(x)]
 
     def train(self, file: Path):    # type: ignore
         
