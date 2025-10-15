@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.1.23)  13 OCT 2025 23:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.1.23)  14 OCT 2025 23:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -210,44 +210,55 @@ Underfull \hbox (badness 10000) in paragraph at lines 40--41
 
  []
 
+
+Underfull \hbox (badness 10000) in paragraph at lines 42--43
+
+ []
+
 <3f.png, id=13, 462.528pt x 346.896pt>
 File: 3f.png Graphic file (type png)
 <use 3f.png>
-Package pdftex.def Info: 3f.png  used on input line 45.
+Package pdftex.def Info: 3f.png  used on input line 47.
 (pdftex.def)             Requested size: 345.0pt x 258.76335pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 48--49
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 50--51
 
  []
 
 <3h.png, id=15, 462.528pt x 346.896pt>
 File: 3h.png Graphic file (type png)
 <use 3h.png>
-Package pdftex.def Info: 3h.png  used on input line 53.
+Package pdftex.def Info: 3h.png  used on input line 55.
 (pdftex.def)             Requested size: 345.0pt x 258.76335pt.
-[2 <./3f.png>] [3 <./3h.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 65--66
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[2]
+Underfull \hbox (badness 10000) in paragraph at lines 67--68
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 78--79
+[3 <./3f.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 80--81
 
  []
 
-[4]
-Overfull \hbox (13.25449pt too wide) in paragraph at lines 84--85
+[4 <./3h.png>] [5]
+Overfull \hbox (13.25449pt too wide) in paragraph at lines 86--87
 []\OT1/cmr/bx/n/10 6 \OT1/cmr/m/n/10 I gen-er-ated sen-tences with two mod-els:
  \OT1/cmtt/m/n/10 gen[]8[]0.005.model \OT1/cmr/m/n/10 and \OT1/cmtt/m/n/10 gen[
 ]5.model\OT1/cmr/m/n/10 . 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 84--85
+Underfull \hbox (badness 10000) in paragraph at lines 86--87
 
  []
 
-[5] [6] (./submit.aux)
+[6] [7] [8] (./submit.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
@@ -256,11 +267,11 @@ L3 programming layer <2024-01-22>
 Here is how much of TeX's memory you used:
  2567 strings out of 474222
  36612 string characters out of 5748733
- 1934975 words of memory out of 5000000
+ 1931975 words of memory out of 5000000
  24818 multiletter control sequences out of 15000+600000
  565869 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 57i,13n,65p,439b,246s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,13n,65p,468b,246s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex7.pfb></usr/share/
@@ -277,10 +288,10 @@ sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texl
 ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texmf/font
 s/type1/public/cm-super/sfrm1000.pfb>
-Output written on submit.pdf (6 pages, 222684 bytes).
+Output written on submit.pdf (8 pages, 226311 bytes).
 PDF statistics:
- 114 PDF objects out of 1000 (max. 8388607)
- 67 compressed objects within 1 object stream
+ 122 PDF objects out of 1000 (max. 8388607)
+ 73 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

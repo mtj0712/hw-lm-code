@@ -31,6 +31,8 @@ Log2-probabilities decrease and perplexities increase if I train on the larger \
 
 \textbf{3(a)} 69 out of 270 files were classified incorrectly. The total error rate is about $0.2556$. \\
 
+\textbf{3(b)} 20 out of 239 files were classified incorrectly. The total error rate is about $0.0837$. \\
+
 \textbf{3(c)} \texttt{textcat} classifies all the dev files as \texttt{spam} when the prior probability of \texttt{gen} is $10^{-324}$. When it is $10^{-323}$, some dev files are classified as \texttt{gen}. \\
 
 \textbf{3(d)} On the \texttt{gen} dev files, the minimum cross-entropy per token that I can achieve is $9.04616$ bits, when $\lambda = 0.005$. On the \texttt{spam} dev files, the minimum cross-entropy per token that I can achieve is $9.09572$ bits, when $\lambda = 0.005$. \\
@@ -115,7 +117,16 @@ One striking difference is that the former model generates sentences that start 
 
 \pagebreak
 
-\textbf{7(c)}
+\textbf{8} Our goal is to maximize the probability that $\vec{w}_i$ was what the speaker was trying to say, given the input sound $u$. Since the language used here is English, we will assume that $p(\vec{w}) = p(\vec{w} | \text{language} = \text{English})$.
+
+\begin{align*}
+	\arg\,max_{i} p(\vec{w}_i | u) &= \arg\,max_{i} \frac{p(\vec{w}_i) \cdot p(u | \vec{w}_i)}{p(u)} \\
+	&= \arg\,max_{i} p(\vec{w}_i) \cdot p(u | \vec{w}_i) \\
+	&= \arg\,max_{i} \log_2 \left( p(\vec{w}_i) \cdot p(u | \vec{w}_i) \right) \\
+	&= \arg\,max_{i} \log_2 \left( p(\vec{w}_i) \right) +  \log_2 \left( p(u | \vec{w}_i) \right)
+\end{align*}
+
+Among the $9$ candidates, we should choose the sentence that has the highest value of $\log_2 \left( p(\vec{w}_i) \right) +  \log_2 \left( p(u | \vec{w}_i) \right)$. The first term is the negative cross-entropy of the sentence given an English language model, and it can be computed with the English language model trained with \texttt{data/english\_spanish/train/en.*}. The second term is explicitly stated in the speech file.
 
 \end{document}
 

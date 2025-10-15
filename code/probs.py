@@ -556,21 +556,21 @@ class EmbeddingLogLinearLanguageModel(LanguageModel, nn.Module):
                 log_prob = self.log_prob_tensor(x, y, z)
                 regularizer = self.l2 / N * ((self.X ** 2).sum() + (self.Y ** 2).sum())
                 F_i = log_prob - regularizer
-                # F_i.backward()
+                F_i.backward()
 
-                # eta = eta0 / (1 + eta0 * 2 * self.l2 / N * t)
+                eta = eta0 / (1 + eta0 * 2 * self.l2 / N * t)
 
                 with torch.no_grad():
                     F += F_i / N
-                #     self.X += eta * self.X.grad
-                #     self.Y += eta * self.Y.grad
+                    self.X += eta * self.X.grad
+                    self.Y += eta * self.Y.grad
 
-                #     self.X.grad.zero_()
-                #     self.Y.grad.zero_()
+                    self.X.grad.zero_()
+                    self.Y.grad.zero_()
 
-                (-F_i).backward()
-                optimizer.step()
-                optimizer.zero_grad()
+                # (-F_i).backward()
+                # optimizer.step()
+                # optimizer.zero_grad()
 
                 t += 1
 
