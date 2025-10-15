@@ -391,10 +391,12 @@ class EmbeddingLogLinearLanguageModel(LanguageModel, nn.Module):
         self.dim: int = dim
 
         self.epochs = epochs
-
-        self.OOV_i = self.vocab.index("OOV")
         
-        self.logits_mem = torch.full((len(vocab), len(vocab), len(vocab)), math.inf)
+        self.vocab_index_map = {}
+        for i, v in enumerate(vocab):
+            self.vocab_index_map[v] = i
+            if v == "OOV":
+                self.OOV_i = i
 
         # We wrap the following matrices in nn.Parameter objects.
         # This lets PyTorch know that these are parameters of the model
@@ -464,22 +466,20 @@ class EmbeddingLogLinearLanguageModel(LanguageModel, nn.Module):
         x_i = self.find_index_in_vocab(x)
         y_i = self.find_index_in_vocab(y)
 
-        if torch.isinf(self.logits_mem[x_i][y_i][0]):
-            x_embedding = self.embeddings[x_i]
-            y_embedding = self.embeddings[y_i]
-            v = x_embedding.view(1, -1) @ self.X + y_embedding.view(1, -1) @ self.Y
-            self.logits_mem[x_i, y_i] = v @ self.embeddings.t()
+        x_embedding = self.embeddings[x_i]
+        y_embedding = self.embeddings[y_i]
 
-        return self.logits_mem[x_i, y_i]
+        v = x_embedding.view(1, -1) @ self.X + y_embedding.view(1, -1) @ self.Y
+        result = v @ self.embeddings.t()
+
+        return result.view(-1)
     
     def find_index_in_vocab(self, x: Wordtype) -> int:
         """Return the index of the word x."""
         try:
-            i = self.vocab.index(x)
-        except ValueError:
-            i = self.OOV_i
-        
-        return i
+            return self.vocab_index_map[x]
+        except KeyError:
+            return self.OOV_i
 
     # def find_embedding(self, x: Wordtype) -> torch.Tensor:
     #     """Return the vector embedding of the word x."""
