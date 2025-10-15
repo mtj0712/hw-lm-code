@@ -238,7 +238,7 @@ class LanguageModel:
     @classmethod
     def load(cls, model_path: Path, device: str = 'cpu') -> "LanguageModel":
         log.info(f"Loading model from {model_path}")
-        model = torch.load(model_path, map_location=device)
+        model = torch.load(model_path, map_location=device, weights_only=False)
             # torch.load is similar to pickle.load but handles tensors too
             # map_location allows loading tensors on different device than saved
         if not isinstance(model, cls):
