@@ -393,10 +393,8 @@ class EmbeddingLogLinearLanguageModel(LanguageModel, nn.Module):
         self.epochs = epochs
 
         self.OOV_i = self.vocab.index("OOV")
-
-        self.logits_mem = [None] * len(vocab)
-        for i in range(len(vocab)):
-            self.logits_mem[i] = [None] * len(vocab)
+        
+        self.logits_mem = torch.full((len(vocab), len(vocab), len(vocab)), math.inf)
 
         # We wrap the following matrices in nn.Parameter objects.
         # This lets PyTorch know that these are parameters of the model
@@ -466,14 +464,13 @@ class EmbeddingLogLinearLanguageModel(LanguageModel, nn.Module):
         x_i = self.find_index_in_vocab(x)
         y_i = self.find_index_in_vocab(y)
 
-        if self.logits_mem[x_i][y_i] is None:
+        if torch.isinf(self.logits_mem[x_i][y_i][0]):
             x_embedding = self.embeddings[x_i]
             y_embedding = self.embeddings[y_i]
             v = x_embedding.view(1, -1) @ self.X + y_embedding.view(1, -1) @ self.Y
-            result = v @ self.embeddings.t()
-            self.logits_mem[x_i][y_i] = result.view(-1)
+            self.logits_mem[x_i, y_i] = v @ self.embeddings.t()
 
-        return self.logits_mem[x_i][y_i]
+        return self.logits_mem[x_i, y_i]
     
     def find_index_in_vocab(self, x: Wordtype) -> int:
         """Return the index of the word x."""
